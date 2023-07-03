@@ -62,13 +62,14 @@ const updateProduct = (id, data) => {
             if (checkProduct === null) {
                 resolve({
                     status: 'ERR',
-                    message: 'The user is not defined',
+                    message: 'The product is not defined',
                 });
             }
+
             const updatedProduct = await Product.findByIdAndUpdate(id, data, { new: true });
             resolve({
                 status: 'OK',
-                message: 'SUCCESS',
+                message: 'SUCCESS update',
                 data: updatedProduct,
             });
         } catch (e) {
@@ -93,6 +94,20 @@ const deleteProduct = (id) => {
             resolve({
                 status: 'OK',
                 message: 'Delete SUCCESS',
+            });
+        } catch (e) {
+            reject(e);
+        }
+    });
+};
+
+const deleteManyProduct = (ids) => {
+    return new Promise(async (resolve, reject) => {
+        try {
+            await Product.deleteMany({ _id: ids });
+            resolve({
+                status: 'ERR',
+                message: 'Delete success',
             });
         } catch (e) {
             reject(e);
@@ -165,7 +180,7 @@ const getAllProduct = (limit, page, sort, filter) => {
                 });
             resolve({
                 status: 'OK',
-                message: 'Delete SUCCESS',
+                message: 'SUCCESS',
                 data: getAllProduct,
                 total: totalProduct,
                 pageCurrent: Number(page + 1),
@@ -182,4 +197,5 @@ module.exports = {
     getDetailProduct,
     deleteProduct,
     getAllProduct,
+    deleteManyProduct,
 };

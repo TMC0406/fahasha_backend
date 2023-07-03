@@ -32,15 +32,15 @@ const createProduct = async (req, res) => {
 };
 const updateProduct = async (req, res) => {
     try {
-        const ProductId = req.params.id;
+        const productId = req.params.id;
         const data = req.body;
-        if (!ProductId) {
+        if (!productId) {
             return res.status(200).json({
                 status: 'ERR',
-                message: 'The ProductId is required',
+                message: 'The productId is required',
             });
         }
-        const response = await ProductService.updateProduct(ProductId, data);
+        const response = await ProductService.updateProduct(productId, data);
         return res.status(200).json(response);
     } catch (e) {
         return res.status(404).json({
@@ -65,6 +65,25 @@ const deleteProduct = async (req, res) => {
         });
     }
 };
+
+const deleteMany = async (req, res) => {
+    try {
+        const ids = req.body.ids;
+        if (!ids) {
+            return res.status(200).json({
+                status: 'ERR',
+                message: 'The ids is required',
+            });
+        }
+        const response = await ProductService.deleteManyProduct(ids);
+        return res.status(200).json(response);
+    } catch (e) {
+        return res.status(404).json({
+            message: e,
+        });
+    }
+};
+
 const getDetailProduct = async (req, res) => {
     try {
         const productId = req.params.id;
@@ -85,7 +104,7 @@ const getDetailProduct = async (req, res) => {
 const getAllProduct = async (req, res) => {
     try {
         const { limit, page, sort, filter } = req.query;
-        const response = await ProductService.getAllProduct(Number(limit) || 10, Number(page) || 0, sort, filter);
+        const response = await ProductService.getAllProduct(Number(limit), Number(page), sort, filter);
         return res.status(200).json(response);
     } catch (e) {
         return res.status(404).json({
@@ -99,4 +118,5 @@ module.exports = {
     getDetailProduct,
     deleteProduct,
     getAllProduct,
+    deleteMany,
 };
