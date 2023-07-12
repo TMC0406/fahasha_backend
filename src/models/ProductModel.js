@@ -12,7 +12,9 @@ const productSchema = new mongoose.Schema(
         rating: { type: Number, required: true },
         description: { type: String, required: true },
         discount: { type: Number },
-        chapter: { type: String },
+        set: { type: String },
+        page: { type: Number, required: true },
+        chapter: { type: Number },
     },
     {
         timestamps: true,

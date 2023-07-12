@@ -15,8 +15,21 @@ const createProduct = async (req, res) => {
             description,
             discount,
             chapter,
+            set,
+            page,
         } = req.body;
-        if (!name || !image || !type || !author || !sold || !price || !countInStock || !rating || !description) {
+        if (
+            !name ||
+            !image ||
+            !type ||
+            !author ||
+            !sold ||
+            !price ||
+            !countInStock ||
+            !rating ||
+            !description ||
+            !page
+        ) {
             return res.status(200).json({
                 status: 'ERR',
                 message: 'The input is required',
@@ -104,7 +117,7 @@ const getDetailProduct = async (req, res) => {
 const getAllProduct = async (req, res) => {
     try {
         const { limit, page, sort, filter } = req.query;
-        const response = await ProductService.getAllProduct(Number(limit), Number(page), sort, filter);
+        const response = await ProductService.getAllProduct(Number(limit) || null, Number(page) || 0, sort, filter);
         return res.status(200).json(response);
     } catch (e) {
         return res.status(404).json({
@@ -112,6 +125,18 @@ const getAllProduct = async (req, res) => {
         });
     }
 };
+
+const getAllType = async (req, res) => {
+    try {
+        const response = await ProductService.getAllType();
+        return res.status(200).json(response);
+    } catch (e) {
+        return res.status(404).json({
+            message: e,
+        });
+    }
+};
+
 module.exports = {
     createProduct,
     updateProduct,
@@ -119,4 +144,5 @@ module.exports = {
     deleteProduct,
     getAllProduct,
     deleteMany,
+    getAllType,
 };
