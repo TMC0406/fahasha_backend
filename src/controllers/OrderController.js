@@ -2,9 +2,11 @@ const OrderService = require('../services/OrderService');
 
 const createOrder = async (req, res) => {
     try {
-        const { paymentMethod, itemsPrice, shippingPrice, totalPrice, fullName, address, city, phone } = req.body;
+        const { paymentMethod, deliveryMethod, itemsPrice, shippingPrice, totalPrice, fullName, address, city, phone } =
+            req.body;
         if (
             !paymentMethod ||
+            !deliveryMethod ||
             !itemsPrice ||
             !shippingPrice ||
             !totalPrice ||
@@ -49,7 +51,7 @@ const getOrderDetail = async (req, res) => {
         if (!orderId) {
             return res.status(200).json({
                 status: 'ERR',
-                message: 'The userId is required',
+                message: 'The orderId is required',
             });
         }
         const response = await OrderService.getOrderDetail(orderId);
@@ -60,8 +62,30 @@ const getOrderDetail = async (req, res) => {
         });
     }
 };
+
+const cancelOrderDetail = async (req, res) => {
+    try {
+        const data = req.body.orderItems;
+        const orderId = req.body.orderId;
+        if (!orderId) {
+            return res.status(200).json({
+                status: 'ERR',
+                message: 'The orderId is required',
+            });
+        }
+        const response = await OrderService.cancelOrderDetail(orderId, data);
+        return res.status(200).json(response);
+    } catch (e) {
+        // console.log(e)
+        return res.status(404).json({
+            message: e,
+        });
+    }
+};
+
 module.exports = {
     createOrder,
     getAllOrderDetail,
     getOrderDetail,
+    cancelOrderDetail,
 };

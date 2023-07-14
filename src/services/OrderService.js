@@ -1,6 +1,4 @@
 const Order = require('../models/OrderModel');
-const bcrypt = require('bcrypt');
-const { genneralAccessToken, genneralRefreshToken } = require('./jwtService');
 const Product = require('../models/ProductModel');
 
 const createOrder = (newOrder) => {
@@ -8,6 +6,7 @@ const createOrder = (newOrder) => {
         const {
             orderItems,
             paymentMethod,
+            deliveryMethod,
             itemsPrice,
             shippingPrice,
             totalPrice,
@@ -17,7 +16,6 @@ const createOrder = (newOrder) => {
             phone,
             user,
         } = newOrder;
-
         try {
             const promises = orderItems.map(async (order) => {
                 const productData = await Product.findOneAndUpdate(
@@ -31,31 +29,13 @@ const createOrder = (newOrder) => {
                             sold: +order.amount,
                         },
                     },
-                    {
-                        new: true,
-                    },
+                    { new: true },
                 );
                 if (productData) {
-                    const createdOrder = await Order.create({
-                        orderItems,
-                        shippingAddress: {
-                            fullName,
-                            address,
-                            city,
-                            phone,
-                        },
-                        paymentMethod,
-                        itemsPrice,
-                        shippingPrice,
-                        totalPrice,
-                        user: user,
-                    });
-                    if (createdOrder) {
-                        return {
-                            status: 'OK',
-                            message: 'SUCCESS',
-                        };
-                    }
+                    return {
+                        status: 'OK',
+                        message: 'SUCCESS',
+                    };
                 } else {
                     return {
                         status: 'OK',
@@ -67,16 +47,39 @@ const createOrder = (newOrder) => {
             const results = await Promise.all(promises);
             const newData = results && results.filter((item) => item.id);
             if (newData.length) {
+                const arrId = [];
+                newData.forEach((item) => {
+                    arrId.push(item.id);
+                });
                 resolve({
                     status: 'ERR',
-                    message: `San pham voi id ${newData.join(',')} khong du hang `,
+                    message: `San pham voi id: ${arrId.join(',')} khong du hang`,
                 });
+            } else {
+                const createdOrder = await Order.create({
+                    orderItems,
+                    shippingAddress: {
+                        fullName,
+                        address,
+                        city,
+                        phone,
+                    },
+                    paymentMethod,
+                    deliveryMethod,
+                    itemsPrice,
+                    shippingPrice,
+                    totalPrice,
+                    user: user,
+                });
+                if (createdOrder) {
+                    resolve({
+                        status: 'OK',
+                        message: 'success',
+                    });
+                }
             }
-            resolve({
-                status: 'OK',
-                message: 'SUCCESS',
-            });
         } catch (e) {
+            //   console.log('e', e)
             reject(e);
         }
     });
@@ -126,9 +129,63 @@ const getOrderDetail = (id) => {
         }
     });
 };
+const cancelOrderDetail = (id, data) => {
+    return new Promise(async (resolve, reject) => {
+        try {
+            let order = [];
+            const promises = data.map(async (order) => {
+                const productData = await Product.findOneAndUpdate(
+                    {
+                        _id: order.product,
+                        sold: { $gte: order.amount },
+                    },
+                    {
+                        $inc: {
+                            countInStock: +order.amount,
+                            sold: -order.amount,
+                        },
+                    },
+                    { new: true },
+                );
+                if (productData) {
+                    order = await Order.findByIdAndDelete(id);
+                    if (order === null) {
+                        resolve({
+                            status: 'ERR',
+                            message: 'The order is not defined',
+                        });
+                    }
+                } else {
+                    return {
+                        status: 'OK',
+                        message: 'ERR',
+                        id: order.product,
+                    };
+                }
+            });
+            const results = await Promise.all(promises);
+            const newData = results && results[0] && results[0].id;
+
+            if (newData) {
+                resolve({
+                    status: 'ERR',
+                    message: `San pham voi id: ${newData} khong ton tai`,
+                });
+            }
+            resolve({
+                status: 'OK',
+                message: 'success',
+                data: order,
+            });
+        } catch (e) {
+            reject(e);
+        }
+    });
+};
 
 module.exports = {
     createOrder,
     getAllOrderDetail,
     getOrderDetail,
+    cancelOrderDetail,
 };
