@@ -7,5 +7,6 @@ router.post('/create/:id', authUserMiddleWare, OrderController.createOrder);
 router.get('/get-order-all/:id', authUserMiddleWare, OrderController.getAllOrderDetail);
 router.get('/get-order-detail/:id', OrderController.getOrderDetail);
 router.delete('/cancel-order/:id', authUserMiddleWare, OrderController.cancelOrderDetail);
+router.get('/get-all-order', authMiddleWare, OrderController.getAllOrder);
 
 module.exports = router;

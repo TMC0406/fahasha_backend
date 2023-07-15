@@ -1,6 +1,6 @@
 const Order = require('../models/OrderModel');
 const Product = require('../models/ProductModel');
-
+const EmailService = require('./EmailService');
 const createOrder = (newOrder) => {
     return new Promise(async (resolve, reject) => {
         const {
@@ -15,6 +15,9 @@ const createOrder = (newOrder) => {
             city,
             phone,
             user,
+            isPaid,
+            paidAt,
+            email,
         } = newOrder;
         try {
             const promises = orderItems.map(async (order) => {
@@ -63,6 +66,7 @@ const createOrder = (newOrder) => {
                         address,
                         city,
                         phone,
+                        email,
                     },
                     paymentMethod,
                     deliveryMethod,
@@ -70,8 +74,11 @@ const createOrder = (newOrder) => {
                     shippingPrice,
                     totalPrice,
                     user: user,
+                    isPaid,
+                    paidAt,
                 });
                 if (createdOrder) {
+                    // await EmailService.sentEmailCreateOrder(email, orderItems);
                     resolve({
                         status: 'OK',
                         message: 'success',
@@ -182,10 +189,24 @@ const cancelOrderDetail = (id, data) => {
         }
     });
 };
-
+const getAllOrder = () => {
+    return new Promise(async (resolve, reject) => {
+        try {
+            const allOrder = await Order.find().sort({ createdAt: -1, updatedAt: -1 });
+            resolve({
+                status: 'OK',
+                message: 'Success',
+                data: allOrder,
+            });
+        } catch (e) {
+            reject(e);
+        }
+    });
+};
 module.exports = {
     createOrder,
     getAllOrderDetail,
     getOrderDetail,
     cancelOrderDetail,
+    getAllOrder,
 };
