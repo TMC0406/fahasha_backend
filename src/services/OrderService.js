@@ -144,7 +144,6 @@ const cancelOrderDetail = (id, data) => {
                 const productData = await Product.findOneAndUpdate(
                     {
                         _id: order.product,
-                        sold: { $gte: order.amount },
                     },
                     {
                         $inc: {
