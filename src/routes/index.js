@@ -3,6 +3,7 @@ const ProductRoute = require('./ProductRouter');
 const OrderRoute = require('./OrderRouter');
 const PaymentRouter = require('./PaymentRouter');
 const CategoryRouter = require('./CategoryRouter');
+const CommentRouter = require('./CommentRouter');
 
 const routes = (app) => {
     app.use('/api/user', UserRoute);
@@ -10,6 +11,7 @@ const routes = (app) => {
     app.use('/api/order', OrderRoute);
     app.use('/api/payment', PaymentRouter);
     app.use('/api/category', CategoryRouter);
+    app.use('/api/comment', CommentRouter);
 };
 
 module.exports = routes;
