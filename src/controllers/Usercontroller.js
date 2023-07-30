@@ -178,6 +178,24 @@ const logoutUser = async (req, res) => {
         });
     }
 };
+const resetPass = async (req, res) => {
+    try {
+        const data = req.body;
+        const userEmail = req.params.email;
+        if (!userEmail) {
+            return res.status(200).json({
+                status: 'ERR',
+                message: 'The userId is required',
+            });
+        }
+        const response = await UserService.resetPass(userEmail, data);
+        return res.status(200).json(response);
+    } catch (e) {
+        return res.status(404).json({
+            message: e,
+        });
+    }
+};
 module.exports = {
     createUser,
     loginUser,
@@ -188,4 +206,5 @@ module.exports = {
     refreshToken,
     logoutUser,
     deleteMany,
+    resetPass,
 };

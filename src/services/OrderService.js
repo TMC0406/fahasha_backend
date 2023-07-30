@@ -202,10 +202,34 @@ const getAllOrder = () => {
         }
     });
 };
+const deleteOrder = (id) => {
+    return new Promise(async (resolve, reject) => {
+        try {
+            const checkOrder = await Order.findOne({
+                _id: id,
+            });
+            if (checkOrder === null) {
+                resolve({
+                    status: 'ERR',
+                    message: 'The user is not defined',
+                });
+            }
+
+            await Order.findByIdAndDelete(id);
+            resolve({
+                status: 'OK',
+                message: 'Delete user success',
+            });
+        } catch (e) {
+            reject(e);
+        }
+    });
+};
 module.exports = {
     createOrder,
     getAllOrderDetail,
     getOrderDetail,
     cancelOrderDetail,
     getAllOrder,
+    deleteOrder,
 };

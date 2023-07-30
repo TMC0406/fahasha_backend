@@ -178,7 +178,30 @@ const getDetailsUser = (id) => {
         }
     });
 };
+const resetPass = (email, data) => {
+    return new Promise(async (resolve, reject) => {
+        try {
+            const checkEmail = await User.findOne({
+                email: email,
+            });
+            if (checkEmail === null) {
+                resolve({
+                    status: 'ERR',
+                    message: 'The user is not defined',
+                });
+            }
 
+            const updatedPass = await User.findOneAndUpdate(email, data, { new: true });
+            resolve({
+                status: 'OK',
+                message: 'SUCCESS',
+                data: updatedPass,
+            });
+        } catch (e) {
+            reject(e);
+        }
+    });
+};
 module.exports = {
     createUser,
     loginUser,
@@ -187,4 +210,5 @@ module.exports = {
     getAllUser,
     getDetailsUser,
     deleteManyUser,
+    resetPass,
 };
